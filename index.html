@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="Play Monster Survivors - An exciting survival action game where you fight endless waves of monsters. Test your skills and survive as long as you can!">
+    <meta name="keywords" content="Monster Survivors, online game, survival game, action game, browser game">
+    <title>Monster Survivors - Survive Against Endless Waves of Monsters</title>
+    <link rel="canonical" href="https://monstersurvivors.com" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        .desktop-nav {
+            display: none;
+            gap: 1.5rem;
+        }
+        
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .mobile-nav-button {
+            display: none;
+            padding: 0.5rem;
+            color: white;
+            font-size: 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        
+        @media (min-width: 768px) {
+            .mobile-nav, .mobile-nav-button {
+                display: none !important;
+            }
+            
+            .desktop-nav {
+                display: flex !important;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            .desktop-nav {
+                display: none !important;
+            }
+            
+            .mobile-nav-button {
+                display: block !important;
+            }
+            
+            .mobile-nav.active {
+                display: flex !important;
+            }
+        }
+        
+        .touch-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .joystick-base {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+        
+        .joystick-stick {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease;
+        }
+        
+        .action-buttons {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .action-button {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            margin: 10px;
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .action-button:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: color 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            color: white;
+        }
+        
+        @media (min-width: 768px) {
+            .hidden.md\:flex {
+                display: flex !important;
+            }
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            background: linear-gradient(135deg, #4f46e5, #3b82f6, #2563eb);
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+        
+        header .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        main {
+            padding-top: 120px;
+        }
+        
+        #play, #controls, #features, #about {
+            scroll-margin-top: 140px;
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                background: linear-gradient(135deg, #4f46e5, #3b82f6, #2563eb);
+            }
+            
+            #play, #controls, #features, #about {
+                scroll-margin-top: 200px;
+            }
+            
+            header h1 {
+                font-size: 2.5rem !important;
+            }
+            
+            header p {
+                font-size: 0.875rem !important;
+                margin-top: 0.5rem;
+            }
+            
+            .touch-controls, .action-buttons {
+                display: block;
+            }
+            
+            .hidden.md\:flex {
+                display: none !important;
+            }
+            
+            .game-container {
+                position: relative;
+                height: 85vh;
+                width: 100%;
+                overflow: hidden;
+                margin: 0.5rem 0;
+                border-radius: 1rem;
+                border: 2px solid rgba(59, 130, 246, 0.5);
+            }
+            
+            #play {
+                margin-top: 0.5rem;
+            }
+            
+            #play h2 {
+                display: none;
+            }
+            
+            .game-description {
+                text-align: center;
+                color: rgba(255, 255, 255, 0.9);
+                font-size: 1.125rem;
+                line-height: 1.5;
+                margin: 1rem 0;
+                padding: 0 1rem;
+            }
+            
+            #features h2 {
+                font-size: 28px !important;
+                margin-bottom: 2rem;
+            }
+            
+            .game-features-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                padding: 0;
+            }
+            
+            .feature-item {
+                width: 100%;
+                display: block;
+                padding: 1.5rem;
+                background: rgba(30, 41, 59, 0.8);
+                border-radius: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .feature-item-icon {
+                width: 48px;
+                height: 48px;
+                background: rgb(30, 58, 138);
+                border-radius: 12px;
+                font-size: 20px;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .feature-item h3 {
+                font-size: 1.5rem;
+                font-weight: bold;
+                margin-bottom: 0.75rem;
+                color: white;
+            }
+            
+            .feature-item p {
+                font-size: 1rem;
+                line-height: 1.5;
+                color: rgba(255, 255, 255, 0.7);
+            }
+            
+            #features h2 {
+                font-size: 28px !important;
+                margin-bottom: 2rem;
+            }
+            
+            .mobile-nav-button {
+                display: block;
+                padding: 0.5rem;
+                color: white;
+                font-size: 24px;
+            }
+            
+            .mobile-nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                z-index: 1000;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(5px);
+            }
+            
+            .mobile-nav.active {
+                display: flex;
+            }
+            
+            .mobile-nav-links {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 2rem;
+            }
+            
+            .mobile-nav-links .nav-link {
+                font-size: 1.5rem;
+            }
+            
+            .mobile-nav-close {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                color: white;
+                font-size: 24px;
+                padding: 0.5rem;
+            }
+            
+            h1 {
+                font-size: 2rem !important;
+            }
+            
+            h2 {
+                font-size: 1.75rem !important;
+            }
+            
+            .text-xl {
+                font-size: 1.125rem !important;
+            }
+            
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            .mb-20 {
+                margin-bottom: 2rem;
+            }
+            
+            .mb-12 {
+                margin-bottom: 1.5rem;
+            }
+            
+            .clickable {
+                min-height: 44px;
+                min-width: 44px;
+                padding: 12px;
+                touch-action: manipulation;
+            }
+        }
+        
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 2rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .game-features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 1.5rem;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 1rem;
+            gap: 1rem;
+        }
+        
+        .feature-item-icon {
+            width: 48px;
+            height: 48px;
+            background: rgb(30, 58, 138);
+            border-radius: 12px;
+            font-size: 20px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .feature-item h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            color: white;
+        }
+        
+        .feature-item p {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        @media (max-width: 768px) {
+            .game-features-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .feature-item {
+                width: 100%;
+                margin-bottom: 0;
+            }
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, #4f46e5, #3b82f6, #2563eb);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+        
+        .cta-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        @media (max-width: 768px) {
+            .cta-section {
+                padding: 2.5rem 1rem;
+            }
+            
+            .cta-section h2 {
+                font-size: 1.75rem !important;
+                margin-bottom: 0.75rem;
+            }
+            
+            .cta-section p {
+                font-size: 1rem !important;
+                max-width: 320px;
+                margin-left: auto;
+                margin-right: auto;
+                margin-bottom: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <header class="w-full bg-blue-600">
+        <div class="container mx-auto px-4 py-6">
+            <nav class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-bold text-white">Monster Survivors</h1>
+                    <p class="text-xl text-white/90 mt-2">Survive and fight against endless waves of monsters!</p>
+                </div>
+                <button class="mobile-nav-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="desktop-nav">
+                    <a href="#play" class="nav-link">Play Now</a>
+                    <a href="#controls" class="nav-link">How to Play</a>
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="#about" class="nav-link">About</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="mobile-nav">
+        <button class="mobile-nav-close">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="mobile-nav-links">
+            <a href="#play" class="nav-link">Play Now</a>
+            <a href="#controls" class="nav-link">How to Play</a>
+            <a href="#features" class="nav-link">Features</a>
+            <a href="#about" class="nav-link">About</a>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-4 py-8">
+        <!-- Game Section -->
+        <section id="play" class="mb-12">
+            <h2 class="text-3xl font-bold mb-6 text-gray-900">Play Monster Survivors</h2>
+            <div class="game-container w-full aspect-[16/9] bg-gray-100 rounded-lg overflow-hidden shadow-lg">
+                <iframe 
+                    src="https://cloud.onlinegames.io/games/2025/unity/monster-survivors/index-og.html"
+                    class="game-iframe w-full h-full border-0"
+                    allowfullscreen
+                ></iframe>
+                
+                <!-- Mobile Touch Controls -->
+                <div class="touch-controls">
+                    <div class="joystick-base">
+                        <div class="joystick-stick"></div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-button">A</button>
+                    <button class="action-button">B</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- How to Play -->
+        <section id="controls" class="mb-20">
+            <h2 class="text-4xl font-bold text-center mb-12">How to Play</h2>
+            <div class="feature-card max-w-3xl mx-auto">
+                <ul class="space-y-4 text-gray-300 flex flex-col items-center">
+                    <li class="flex items-center gap-4 w-full justify-center">
+                        <div class="feature-item-icon" style="background: rgba(59, 130, 246, 0.2);">
+                            <i class="fas fa-desktop text-blue-500"></i>
+                        </div>
+                        Desktop: Use WASD or arrow keys to move your character
+                    </li>
+                    <li class="flex items-center gap-4 w-full justify-center">
+                        <div class="feature-item-icon" style="background: rgba(59, 130, 246, 0.2);">
+                            <i class="fas fa-mobile-alt text-blue-500"></i>
+                        </div>
+                        Mobile: Use the virtual joystick on the left to control movement
+                    </li>
+                    <div class="w-full max-w-md space-y-4">
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            Avoid enemy attacks while collecting power-ups
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            Survive as long as possible against endless waves
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            Adapt your strategy as monsters become stronger
+                        </li>
+                    </div>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Game Features -->
+        <section id="features" class="mb-20">
+            <h2 class="text-4xl font-bold text-center mb-12">Game Features</h2>
+            
+            <div class="game-features-grid">
+                <div class="feature-item">
+                    <div class="feature-item-icon" style="background: rgba(59, 130, 246, 0.2);">
+                        <i class="fas fa-user text-blue-500"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-2">Character Selection</h3>
+                        <p class="text-gray-300">Choose from multiple characters, each with unique starting stats and abilities.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-item-icon" style="background: rgba(59, 130, 246, 0.2);">
+                        <i class="fas fa-arrow-up text-blue-500"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-2">Level-Up System</h3>
+                        <p class="text-gray-300">Gain experience by defeating enemies and make crucial ability choices every level.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-item-icon" style="background: rgba(59, 130, 246, 0.2);">
+                        <i class="fas fa-khanda text-blue-500"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-2">Powerful Weapons</h3>
+                        <p class="text-gray-300">Unlock and upgrade a diverse arsenal of weapons, from swords and axes to magical spells.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-item-icon" style="background: rgba(59, 130, 246, 0.2);">
+                        <i class="fas fa-crown text-blue-500"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-2">Epic Boss Fights</h3>
+                        <p class="text-gray-300">Challenge massive boss monsters with unique mechanics at timed intervals.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-item-icon" style="background: rgba(59, 130, 246, 0.2);">
+                        <i class="fas fa-skull text-blue-500"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-2">Varied Enemies</h3>
+                        <p class="text-gray-300">Face diverse monster types with unique behaviors, attack patterns, and abilities.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-item-icon" style="background: rgba(59, 130, 246, 0.2);">
+                        <i class="fas fa-trophy text-blue-500"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-2">Achievements & Unlocks</h3>
+                        <p class="text-gray-300">Complete achievements to unlock new characters, weapons, and game-changing artifacts.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Game Description -->
+        <section id="about" class="mb-12">
+            <h2 class="text-4xl font-bold text-center mb-12">About The Game</h2>
+            <div class="feature-item max-w-2xl mx-auto">
+                <div class="feature-item-icon" style="background: rgba(59, 130, 246, 0.2);">
+                    <i class="fas fa-gamepad text-blue-500"></i>
+                </div>
+                <div>
+                    <p class="text-gray-300 leading-relaxed">
+                        Monster Survivors is an action-packed roguelike where you battle endless waves of monsters. Choose your character, level up to unlock powerful abilities, and create unique builds for each run. With simple controls but deep gameplay mechanics, every playthrough offers a fresh challenge that will keep you coming back for more!
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Call to Action -->
+    <section class="cta-section py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-4xl font-bold text-white mb-4">Ready to Join the Battle?</h2>
+            <p class="text-xl text-white/90 mb-8">Challenge yourself against endless waves of monsters and see how long you can survive!</p>
+            <a href="#play" class="cta-button inline-flex items-center px-8 py-3 bg-white text-blue-600 font-semibold rounded-full hover:bg-opacity-90">
+                Play Now
+                <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+    </section>
+
+    <footer class="bg-gray-50 border-t border-gray-200">
+        <div class="container mx-auto px-4 py-8">
+            <p class="text-center text-gray-600">© 2024 Monster Survivors. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileNavButton = document.querySelector('.mobile-nav-button');
+            const mobileNavClose = document.querySelector('.mobile-nav-close');
+            const mobileNav = document.querySelector('.mobile-nav');
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav .nav-link');
+            const desktopNavLinks = document.querySelectorAll('.desktop-nav .nav-link');
+            
+            function toggleMobileNav() {
+                mobileNav.classList.toggle('active');
+                document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
+            }
+            
+            mobileNavButton.addEventListener('click', toggleMobileNav);
+            mobileNavClose.addEventListener('click', toggleMobileNav);
+            
+            function smoothScrollToTarget(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const target = document.querySelector(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+            
+            mobileNavLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    toggleMobileNav();
+                    smoothScrollToTarget.call(link, e);
+                });
+            });
+            
+            desktopNavLinks.forEach(link => {
+                link.addEventListener('click', smoothScrollToTarget);
+            });
+        });
+
+        // Mobile touch controls
+        document.addEventListener('DOMContentLoaded', function() {
+            const joystickBase = document.querySelector('.joystick-base');
+            const joystickStick = document.querySelector('.joystick-stick');
+            
+            if (!joystickBase || !joystickStick) return;
+            
+            let isDragging = false;
+            let startX, startY;
+            const maxDistance = 35; // Maximum joystick movement distance
+            
+            // Touch start
+            joystickBase.addEventListener('touchstart', function(e) {
+                isDragging = true;
+                const touch = e.touches[0];
+                const rect = joystickBase.getBoundingClientRect();
+                startX = touch.clientX - rect.left;
+                startY = touch.clientY - rect.top;
+                
+                // Add haptic feedback if supported
+                if (window.navigator.vibrate) {
+                    window.navigator.vibrate(50);
+                }
+            });
+            
+            // Touch move
+            document.addEventListener('touchmove', function(e) {
+                if (!isDragging) return;
+                
+                const touch = e.touches[0];
+                const rect = joystickBase.getBoundingClientRect();
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                
+                // Calculate distance from center
+                const deltaX = x - rect.width / 2;
+                const deltaY = y - rect.height / 2;
+                const distance = Math.min(maxDistance, Math.sqrt(deltaX * deltaX + deltaY * deltaY));
+                const angle = Math.atan2(deltaY, deltaX);
+                
+                // Update joystick position
+                const stickX = Math.cos(angle) * distance;
+                const stickY = Math.sin(angle) * distance;
+                
+                joystickStick.style.transform = `translate(calc(-50% + ${stickX}px), calc(-50% + ${stickY}px))`;
+                
+                e.preventDefault();
+            });
+            
+            // Touch end
+            document.addEventListener('touchend', function() {
+                if (!isDragging) return;
+                isDragging = false;
+                
+                // Return joystick to center
+                joystickStick.style.transform = 'translate(-50%, -50%)';
+            });
+            
+            // Action button touch feedback
+            const actionButtons = document.querySelectorAll('.action-button');
+            actionButtons.forEach(button => {
+                button.addEventListener('touchstart', function() {
+                    if (window.navigator.vibrate) {
+                        window.navigator.vibrate(50);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
